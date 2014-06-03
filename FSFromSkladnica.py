@@ -104,17 +104,8 @@ special_tfw_to_attr = {
 
 def tfw_to_attr(node):
     tfw = node.fs[SkladnicaFs.tfw]
-    #print 'tfw_to_attr:', tfw
     if tfw in tfw_to_attr_dict:
-        #print 'in dict:', tfw_to_attr_dict[tfw]
-        #print tfw_to_attr_dict
         return tfw_to_attr_dict[tfw].copy()
-    #TODO: test
-    #elif (tfw == 'np(bier)'):
-    #    if (node.fs[SkladnicaFs.neg] == 'tak'):
-    #        return set(['OBJ', 'OBL-STR'])
-    #    else:
-    #        return set(['OBJ', 'OBL-GEN'])
     if (tfw.startswith('prepnp')):
         return set(['OBL', 'OBL2', 'OBL3', 'OBL-AG'])
     '''fzd z korelatem'''
@@ -148,16 +139,10 @@ def find_pred(node):
                 for c_class, comps in comp_classes.items():
                     if pred in comps:
                         pred = c_class
-            #if pred in ('aby', 'ażeby', 'by', 'iżby', 'żeby'):
-            #    pred = 'żeby'
             return node.n_id, pred.strip()#.encode('utf8')
     else:
         if (False and node.cat == SkladnicaCats.fzd):
             pass
-        #    print '---> fzd'
-        #    for child in node.children:
-        #        if (child.cat == SkladnicaCats.zdanie):
-        #            return find_pred(child)
         else:
             if node.rule == 'eps10':
                 return node.n_id, u'na_pewno'
@@ -181,10 +166,6 @@ def find_pred(node):
             if node.rule == 'spoj40':
                 return node.n_id, u'podczas_gdy'
             if (len(node.headChildren) > 1):
-                #if (node.rule in (SkladnicaRules.n_cz6, SkladnicaRules.to2, SkladnicaRules.to8)):
-                #    return find_pred(node.headChildren[1])
-                #if (node.rule in (SkladnicaRules.n_pt2)):
-                #    return find_pred(node.headChildren[2])
                 for index, rules in multiple_heads.items():
                     if node.rule in rules:
                         return find_pred(node.headChildren[index])
