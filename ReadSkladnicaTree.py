@@ -12,7 +12,9 @@ from SkladnicaInfo import *
 #import SkladnicaInfo
 from FSFromSkladnica import find_pred
 
-features = set(['rekcja', 'tfw', u'stopień', 'dest', 'neg', 'czas'])
+features = set([SkladnicaFs.rekcja, SkladnicaFs.tfw, SkladnicaFs.stopien,
+                SkladnicaFs.dest, SkladnicaFs.neg, SkladnicaFs.czas,
+                SkladnicaFs.przypadek, SkladnicaFs.przyim])
 
 coord_rules = set([
     # zdania rownorzednie
@@ -23,6 +25,10 @@ coord_rules = set([
     SkladnicaRules.zdr1, SkladnicaRules.zdr2,
     # fzd szeregowo
     SkladnicaRules.zdsz1, SkladnicaRules.zdsz2, SkladnicaRules.zdsz3,
+    # fwe rownorzednie
+    SkladnicaRules.wer1,
+    # fwe szeregowo
+    SkladnicaRules.wes3,
     # fno rownorzednie
     SkladnicaRules.nor1, SkladnicaRules.nor2, SkladnicaRules.nor3,
     # fno szeregowo
@@ -31,6 +37,8 @@ coord_rules = set([
     SkladnicaRules.pmr1, SkladnicaRules.pmr2, SkladnicaRules.pmr3,
     # fpm szeregowo
     SkladnicaRules.pms1, SkladnicaRules.pms2, SkladnicaRules.pmsz3,
+    # fps szeregowo
+    SkladnicaRules.pss3,
     # przyimki
     SkladnicaRules.pimr1, SkladnicaRules.pimr2, SkladnicaRules.pims3,
     SkladnicaRules.ptsz3,
@@ -163,6 +171,15 @@ class TreeHandler(handler.ContentHandler):
                 if zdanie_ch:    
                     root.headChildren = zdanie_ch
                     root.children = zdanie_ch
+            '''advp realised by prepnp changed to prepnp(_,_)
+            to comply with Walenty'''
+            if (root.cat == SkladnicaCats.fw and root.fs[SkladnicaFs.tfw] == 'advp'
+                    and root.children[0].cat == SkladnicaCats.fpm):
+                #print root
+                fpm_child = root.children[0]
+                prep, case = fpm_child.fs[SkladnicaFs.przyim], fpm_child.fs[SkladnicaFs.przypadek], 
+                root.fs[SkladnicaFs.tfw] = 'prepnp(%s,%s)' % (prep, case)
+                print root.fs[SkladnicaFs.tfw]
             '''(must test) fw fpm's head is fno'''
             #if (parent_fw and root.cat == SkladnicaCats.fpm):
             #    old_ch = root.children

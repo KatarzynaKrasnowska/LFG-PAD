@@ -6,6 +6,7 @@ Created on 10-08-2013
 '''
 
 class SkladnicaCats:
+    #TODO: polish characters should have unicode! - add and check
     ff = 'ff'
     fw = 'fw'
     fl = 'fl'
@@ -31,6 +32,8 @@ class SkladnicaFs:
     dest = 'dest'
     neg = 'neg'
     czas = 'czas'
+    przypadek = 'przypadek'
+    przyim = 'przyim'
 
 class SkladnicaRules:
     int4 = 'int4'     # '. . .'
@@ -58,6 +61,9 @@ class SkladnicaRules:
     zdsz2 = 'zdsz2'
     zdsz3 = 'zdsz3'
     
+    wer1 = 'wer1'
+    wes3 = 'wes3'
+    
     p1 = 'p1'         # zdanie -> zdanie przec spójnik zdanie
     
     r1 = 'r1'
@@ -78,6 +84,7 @@ class SkladnicaRules:
     pms1 = 'pms1'
     pms2 = 'pms2'
     pmsz3 = 'pmsz3'
+    pss3 = 'pss3'
     pimr1 = 'pimr1'
     pimr2 = 'pimr2'
     pims3 = 'pims3'

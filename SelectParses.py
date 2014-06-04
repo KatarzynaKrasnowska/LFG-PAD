@@ -109,7 +109,7 @@ if output_tex:
     os.system('mkdir ' + tex_dir)
     os.system('cp /home/kasia/Dokumenty/Robota/LFG/parses/avm.sty ' + tex_dir)
 processed = 0
-for sent_name in sentences:
+for sent_name in sentences[1120:]:
     sent_count += 1
     if sent_name in skip_sets[sents_dir]:
         #print 'SKIP:', sent_name

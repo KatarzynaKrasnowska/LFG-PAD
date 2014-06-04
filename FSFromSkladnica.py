@@ -10,6 +10,7 @@ from FStructure import AttributeStructure, Semform
 from SkladnicaInfo import multiple_heads
 from FSHelpers import get_from_fs
 from FSConstrs import SkladnicaConstrs
+from PrepnpToObl import get_prepnp_sem_obls
 
 class Special:
     advp = 'advp'
@@ -19,7 +20,12 @@ class Special:
 czy_list = (u'CZY', u'CZYŻ', u'CZYŻBY', u'AZALI', u'AZALIŻ', u'LI')
 czy_list = [czy.lower() for czy in czy_list]
 
-arg_attrs = ('SUBJ', 'OBJ', 'OBJ-TH', 'OBL', 'OBL2', 'OBL3', 'OBL-AG', 'OBL-GEN', 'OBL-INST', 'OBL-STR', 'COMP', 'XCOMP', 'XCOMP-PRED') # TODO complete the list
+arg_attrs = ('SUBJ', 'OBJ', 'OBJ-TH', 'OBL-GEN', 'OBL-INST', 'OBL-STR',
+             'OBL', 'OBL2', 'OBL3',
+             'OBL-AG', 'OBL-COMPAR', 'OBL-ABL', 'OBL-ADL', 'OBL-DUR',
+             'OBL-LOCAT', 'OBL-MOD', 'OBL-PERL', 'OBL-TEMP',
+             'OBL-ADV',
+             'COMP', 'XCOMP', 'XCOMP-PRED') # TODO complete the list
 
 OPT = '-opt'
 BARDZO = 'bardzo'
@@ -89,11 +95,12 @@ tfw_to_attr_dict = {
                     'advp' : set([Special.advp]), # problem zgłoszony przez Witka
                     #'infp(dk)' : set(['XCOMP']),
                     #'infp(nd)' : set(['XCOMP']), # Postanowili-śmy-iść-za-tym-pomysłem-.
-                    'np(bier)' : set(['OBJ', 'OBL-STR']),
+                    'np(bier)' : set(['OBJ', 'OBL-STR', 'OBL-DUR']),
                     'np(cel)' : set(['OBJ', 'OBJ-TH']),
-                    'np(dop)' : set(['OBJ', 'OBL-GEN']),
+                    'np(dop)' : set(['OBJ', 'OBL-GEN', 'OBL-STR', 'OBL-TEMP']),
                     'np(mian)' : set(['XCOMP-PRED', 'OBL-STR']),
-                    'np(narz)' : set(['OBL-INST', 'XCOMP-PRED', 'OBJ']),
+                    'np(narz)' : set(['XCOMP-PRED', 'OBJ', 'OBL-INST', 'OBL-DUR', 'OBL-PERL']),
+                    'np(part)' : set(['OBJ']),
                     'subj' : set(['SUBJ']),
                     }
 
@@ -107,7 +114,7 @@ def tfw_to_attr(node):
     if tfw in tfw_to_attr_dict:
         return tfw_to_attr_dict[tfw].copy()
     if (tfw.startswith('prepnp')):
-        return set(['OBL', 'OBL2', 'OBL3', 'OBL-AG'])
+        return set(['OBL', 'OBL2', 'OBL3', 'OBL-AG']).union(get_prepnp_sem_obls(tfw))
     '''fzd z korelatem'''
     if (tfw.startswith('sentp(o,') or tfw.startswith('sentp(do,')):
         return set(['OBL'])

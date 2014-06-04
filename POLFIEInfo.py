@@ -146,4 +146,7 @@ skip_sets = {'Skladnica_FULL_prolog_20130405' :
              'FULL_20130917_newdict_Skladnica-131011_updated_map':
              set([
                   ]),
+             'Skladnica140410_FULL_prolog_POLFIE2v0.5_W-20140529':
+             set([
+                  ]),
              }
