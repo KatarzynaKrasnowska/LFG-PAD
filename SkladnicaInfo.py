@@ -96,7 +96,9 @@ multiple_heads = {
     'sr2', 'sr14', 'sr51', 'sr52', 'spoj48', 'n_cz6', 'n_cza2', 'n_cz13',
     'n_cz17', 'n_cz21', 'n_cz28', 'n_cz30', 'n_cz33', 'n_cz34', 'to2', 'to6',
     'to8', 'po4', 'int5']),
-    2 : set(['n_pt2', 'n_cz8', 'n_cz15', 'n_cz16', 'n_cz18', 'n_cz23', 'to3']),
+    2 : set(['n_pt2', 'n_cz8', 'n_cz15', 'n_cz16', 'n_cz18', 'n_cz23',
+             'n_cz37',  # nowe (zamiast n_cz16?)
+             'to3']),
     3 : set(['int11', 'int7',]) }
 
 mwe = set(['jel3a', 'jel3b', 'jel3c', 'jel3d', 'eps3', 'eps11', 'eps12', 'eps13',
