@@ -11,6 +11,7 @@ from SkladnicaInfo import multiple_heads
 from FSHelpers import get_from_fs
 from FSConstrs import SkladnicaConstrs
 from PrepnpToObl import get_prepnp_sem_obls
+from AdvpToObl import get_advp_sem_obls
 
 class Special:
     advp = 'advp'
@@ -39,7 +40,7 @@ no_subj = set([
     u'czuć', u'dochodzić', u'dojść', u'iść', u'jechać', u'mieć_się', u'można',
     u'należeć', u'odbijać_się', u'odchodzić', u'odejść', u'odrzucać', u'pachnieć',
     u'pora', u'przybywać', u'przybyć', u'pójść', u'robić_się', u'skręcać',
-    u'skręcić', u'stać', u'stać_się', u'szkoda', u'słychać', u'trzeba',
+    u'skręcić', u'stać', u'stać_się', u'szkoda', u'słychać', u'trudno', u'trzeba',
     u'uczynić_się', u'udawać_się', u'udać_się', u'warto', u'wiadomo', u'widać',
     u'wieść_się', u'wolno', u'wstyd', u'wystarczyć', u'zabraknąć', u'zależeć',
     u'zanieść', u'zanieść_się', u'zanosić', u'zanosić_się', u'zbierać_się',
@@ -61,7 +62,7 @@ obj_th_pro = set([
     u'bronić', u'chcieć_się', u'dawać', u'dawać_się', u'dać', u'dać_się', u'doradzić', u'dozwolić',
     u'kazać', u'kłaść', u'nauczyć', u'obiecać', u'obiecywać', u'pomagać', u'pomóc', u'poradzić',
     u'postawić', u'pozwalać', u'pozwolić', u'położyć', u'proponować', u'przeszkadzać', u'radzić',
-    u'szkoda', u'trudno', u'trzeba', u'udawać_się', u'udać_się', u'uczyć', u'układać', u'ułożyć',
+    u'szkoda', u'trzeba', u'udawać_się', u'udać_się', u'uczyć', u'układać', u'ułożyć',
     u'wolno', u'wstyd', u'zabraniać', u'zaproponować', u'życzyć'
 ])
 
@@ -92,7 +93,7 @@ comp_classes = {
 tfw_to_attr_dict = {
                     'adjp(mian)' : set(['XCOMP-PRED']),
                     'adjp(narz)' : set(['XCOMP-PRED']), #TODO skonsultować
-                    'advp' : set([Special.advp]), # problem zgłoszony przez Witka
+                    #'advp' : set([Special.advp]), # problem zgłoszony przez Witka (not needed anymore?)
                     #'infp(dk)' : set(['XCOMP']),
                     #'infp(nd)' : set(['XCOMP']), # Postanowili-śmy-iść-za-tym-pomysłem-.
                     'np(bier)' : set(['OBJ', 'OBL-STR', 'OBL-DUR']),
@@ -113,8 +114,12 @@ def tfw_to_attr(node):
     tfw = node.fs[SkladnicaFs.tfw]
     if tfw in tfw_to_attr_dict:
         return tfw_to_attr_dict[tfw].copy()
+    '''prepnp lub advp przerobione na prepnp'''
     if (tfw.startswith('prepnp')):
         return set(['OBL', 'OBL2', 'OBL3', 'OBL-AG']).union(get_prepnp_sem_obls(tfw))
+    '''advp przysłówkowe'''
+    if (tfw.startswith('advp')):
+        return get_advp_sem_obls(tfw).copy()
     '''fzd z korelatem'''
     if (tfw.startswith('sentp(o,') or tfw.startswith('sentp(do,')):
         return set(['OBL'])
@@ -124,7 +129,7 @@ def tfw_to_attr(node):
             return set([s])
     if (tfw.startswith('prepadjp')):
         return set(['XCOMP-PRED'])
-    print tfw
+    print '***', tfw
     raise RuntimeError
 
 '''
@@ -723,7 +728,7 @@ def attr_pred_lists(struct, fs, eqs_dict, used_vars=None):
     else:
         ret = []
         if v:
-            print 'attr_pred_lists start', struct
+            print '\nattr_pred_lists start', struct
         '''PREPOSITION'''
         if fs_is_prep(struct, fs, eqs_dict):
             if v:
@@ -733,14 +738,10 @@ def attr_pred_lists(struct, fs, eqs_dict, used_vars=None):
             fs_pred = find_fs_pred(struct, fs, eqs_dict)
             if (not fs_pred):
                 return []
-            if v:
-                print 'getting attr_pred_lists for:', fs_pred
-            if (compatible_with_skladnica(struct, fs, eqs_dict)):
-                #print 'attr_pred_lists - COMPATIBLE:', struct
-                ret.append((fs_pred, collect_attr_preds(struct, fs, eqs_dict)))
-            if v:
-                print 'ret is now:', ret
             for attr, value in struct.attrs.items():
+                if attr == 'REFLEXIVE':
+                    #print fs_pred, '***************REFLEXIVE'
+                    fs_pred += u'_się'
                 val = value
                 if (type(val) == int):
                     '''may be a prep'''
@@ -779,6 +780,13 @@ def attr_pred_lists(struct, fs, eqs_dict, used_vars=None):
                                 ret += attr_pred_lists(s, fs, eqs_dict, used_vars)
                     else:
                         print 'UNKNOWN VAR:', val
+            if v:
+                print 'getting attr_pred_lists for:', fs_pred
+            if (compatible_with_skladnica(struct, fs, eqs_dict)):
+                #print 'attr_pred_lists - COMPATIBLE:', struct
+                ret.append((fs_pred, collect_attr_preds(struct, fs, eqs_dict)))
+            if v:
+                print 'ret is now:', ret
         elif type(struct) == AttributeStructure and struct.set_elements:
             for s in struct.set_elements:#collect_attr_structs(struct, fs):
                 elem = get_from_fs(s, fs, eqs_dict)
@@ -886,7 +894,7 @@ def check_attrs_with_constr(a_preds, skladnica_cs):
     return True
 
 def check_with_skladnica_constrs_2(constrs, fs, eqs):
-    v = False
+    v = True
     no_match = 0
     if v:
         print '========= check_with_skladnica_constrs_2\n\n'
