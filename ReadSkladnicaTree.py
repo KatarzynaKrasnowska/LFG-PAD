@@ -171,15 +171,19 @@ class TreeHandler(handler.ContentHandler):
                 if zdanie_ch:    
                     root.headChildren = zdanie_ch
                     root.children = zdanie_ch
-            '''advp realised by prepnp changed to prepnp(_,_)
+            '''advp realised by prepnp changed to advp(_,_)
             to comply with Walenty'''
             if (root.cat == SkladnicaCats.fw and root.fs[SkladnicaFs.tfw] == 'advp'
                     and root.children[0].cat == SkladnicaCats.fpm):
                 #print root
                 fpm_child = root.children[0]
                 prep, case = fpm_child.fs[SkladnicaFs.przyim], fpm_child.fs[SkladnicaFs.przypadek], 
-                root.fs[SkladnicaFs.tfw] = 'prepnp(%s,%s)' % (prep, case)
+                root.fs[SkladnicaFs.tfw] = u'prepnp(%s,%s)' % (prep, case)
                 print root.fs[SkladnicaFs.tfw]
+            ''''advp realised by adv - retrieve the adv'''
+            if (root.cat == SkladnicaCats.fw and root.fs[SkladnicaFs.tfw] == 'advp'):
+                _, adv = find_pred(root)
+                root.fs[SkladnicaFs.tfw] = u'advp(%s)' % adv
             '''(must test) fw fpm's head is fno'''
             #if (parent_fw and root.cat == SkladnicaCats.fpm):
             #    old_ch = root.children
