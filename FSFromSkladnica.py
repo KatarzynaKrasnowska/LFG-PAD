@@ -37,7 +37,10 @@ no_subj = set([
     #u'chcieć_się', u'czas', u'można', u'należeć', u'pora', u'udawać_się', u'udać_się',
     #u'warto', u'żal', u'szkoda', u'trzeba', u'wolno', u'wstyd'
     u'brak', u'brakować', u'bywać', u'być', u'chcieć_się', u'chodzić', u'czas',
-    u'czuć', u'dochodzić', u'dojść', u'iść', u'jechać', u'mieć_się', u'można',
+    u'czuć', u'dochodzić', u'dojść', u'iść', u'jechać',
+    #nowe
+    u'korcić',
+    u'mieć_się', u'można',
     u'należeć', u'odbijać_się', u'odchodzić', u'odejść', u'odrzucać', u'pachnieć',
     u'pora', u'przybywać', u'przybyć', u'pójść', u'robić_się', u'skręcać',
     u'skręcić', u'stać', u'stać_się', u'szkoda', u'słychać', u'trudno', u'trzeba',
@@ -60,7 +63,9 @@ opt_subj = set([
 
 obj_th_pro = set([
     u'bronić', u'chcieć_się', u'dawać', u'dawać_się', u'dać', u'dać_się', u'doradzić', u'dozwolić',
-    u'kazać', u'kłaść', u'nauczyć', u'obiecać', u'obiecywać', u'pomagać', u'pomóc', u'poradzić',
+    u'kazać', u'kłaść', u'nauczyć', u'obiecać', u'obiecywać', u'pomagać',
+    #u'pomóc',
+    u'poradzić',
     u'postawić', u'pozwalać', u'pozwolić', u'położyć', u'proponować', u'przeszkadzać', u'radzić',
     u'szkoda', u'trzeba', u'udawać_się', u'udać_się', u'uczyć', u'układać', u'ułożyć',
     u'wolno', u'wstyd', u'zabraniać', u'zaproponować', u'życzyć'
@@ -98,6 +103,8 @@ tfw_to_attr_dict = {
                     #'infp(nd)' : set(['XCOMP']), # Postanowili-śmy-iść-za-tym-pomysłem-.
                     'np(bier)' : set(['OBJ', 'OBL-STR', 'OBL-DUR']),
                     'np(cel)' : set(['OBJ', 'OBJ-TH']),
+                    #SUBJ w zdaniach typu "nie było czegoś";
+                    #TODO: kłóci się z SUBJ pro
                     'np(dop)' : set(['OBJ', 'OBL-GEN', 'OBL-STR', 'OBL-TEMP']),
                     'np(mian)' : set(['XCOMP-PRED', 'OBL-STR']),
                     'np(narz)' : set(['XCOMP-PRED', 'OBJ', 'OBL-INST', 'OBL-DUR', 'OBL-PERL']),
@@ -894,7 +901,7 @@ def check_attrs_with_constr(a_preds, skladnica_cs):
     return True
 
 def check_with_skladnica_constrs_2(constrs, fs, eqs):
-    v = True
+    v = False
     no_match = 0
     if v:
         print '========= check_with_skladnica_constrs_2\n\n'
