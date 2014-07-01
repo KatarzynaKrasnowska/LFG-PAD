@@ -133,6 +133,7 @@ def opts_tree(opts_list):
     return tree
 
 def new_choices(opts_list):
+    #print '------'
     #for opts in opts_list:
     #    print ' '.join(sorted_opts(opts))
     tree = opts_tree(opts_list)
@@ -243,10 +244,35 @@ def new_choices(opts_list):
     #for i, opts in sorted([(i, opts) for opts, i in opts_last_index.items()]):
     for opts in ordered_opts:
         ret2.append(Choice(list(opts), opts_conds[opts]))
-    return ret2, rnm, eqv, mrg
+    prnts = {'1' : set('_')}
+    for choice in ret2:
+        for opt in choice.choices:
+            if not opt in prnts:
+                prnts[opt] = set()
+            prnts[opt].update(choice.conditions)
+    return ret2, rnm, eqv, mrg, prnts
 
-def fixed_conditions(conditions, active_opts, renamings, equivalences, merged):
+'''If all daughters of a choice branching are present in conditions,
+replace them with their parent. This will not allow spurious discriminants.
+Search choices in reverse order - bottom up.
+Returns the fixed conditions.'''
+def merge_siblings_conditions(conditions, choices, choice_parents):
+    '''only delete a choice from the condition if all its parents are present'''
+    current_conditions = conditions.copy()
+    for choice in reversed(choices):
+        if current_conditions.issuperset(set(choice.choices)):
+            #print '    ==== add parent:', current_conditions
+            #print '    ==== found in:', choice
+            current_conditions.update(choice.conditions)
+            #print '    ==== new conditions:', current_conditions
+    current_conditions = set([c for c in current_conditions if not current_conditions.issuperset(choice_parents[c])])
+    #return conditions 
+    #print '    ==== returned conditions:', current_conditions
+    return current_conditions
+
+def fixed_conditions(conditions, active_opts, renamings, equivalences, merged, choices, choice_parents):
     #print 'c:', conditions
+    #print 'choices:', ' * '.join([str(c) for c in choices])
     fixed = set()
     fixed_2 = set()
     for o in conditions:
@@ -272,4 +298,5 @@ def fixed_conditions(conditions, active_opts, renamings, equivalences, merged):
         if o in merged:
             fixed.update(merged[o])
     fixed = set([o for o in fixed if o in active_opts])
-    return sorted(fixed)
+    #print 'fixed:', sorted(fixed)
+    return sorted(merge_siblings_conditions(fixed, choices, choice_parents))

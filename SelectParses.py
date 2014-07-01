@@ -54,7 +54,7 @@ def collect_fs_info(fs, eqs):
     fs_attr_vals.update(collect_attr_vals(fs, eqs))
     fs_adj_attrs.update(collect_adj_attrs(fs, eqs))
 
-output_min_no_match, print_all_constrs, output_tex = False, False, False
+output_min_no_match, print_all_constrs, output_tex = False, True, False
 output_min_no_match = True
 #print_all_constrs = True
 #output_tex = True
@@ -73,6 +73,7 @@ sents_file = ('/home/kasia/Dokumenty/Robota/LFG/Iness/all-17092013.txt')
 sents_file = ('/home/kasia/Dokumenty/Robota/LFG/Iness/all-11102013.txt')
 sents_file = ('/home/kasia/Dokumenty/Robota/LFG/Iness/all-13012014.txt')
 sents_file = ('/home/kasia/Dokumenty/Robota/LFG/Iness/all-02062014.txt')
+sents_file = ('/home/kasia/Dokumenty/Robota/LFG/Iness/all-09062014.txt')
 #sents_file = ('/home/kasia/Dokumenty/Robota/LFG/Iness/test.txt')
 with open (sents_file, 'r') as f:
     for l in f.readlines():
@@ -92,6 +93,7 @@ sents_dir = 'FULL_20130917_newdict_Skladnica-131011'
 sents_dir = 'FULL_20130917_newdict_Skladnica-131011_updated_map'
 sents_dir = 'FULL_20130917_newdict_Skladnica-131011_updated_map'
 sents_dir = 'Skladnica140410_FULL_prolog_POLFIE2v0.5_W-20140529'
+sents_dir = 'Skladnica140410_FULL_prolog_POLFIE2v0.5_W-20140608'
 #sents_dir = 'Skladnica_FULL_prolog_20130917_newdict'
 #sents_dir = 'disamb/kasia-test'
 file_suff = '-dis.pl'
@@ -100,6 +102,7 @@ stats = 'SENT_ID,SOLUTIONS,NUM_BEST,PERCENTAGE_BEST\n'
 sentences_solutions = {}
 #sents_dir = 'agnieszka-disamb'
 missing = []
+print 'rm /home/kasia/Dokumenty/Robota/LFG/parses/ranked/%s/*' % (sents_dir)
 os.system('rm /home/kasia/Dokumenty/Robota/LFG/parses/ranked/%s/*' % (sents_dir))
 os.system('mkdir /home/kasia/Dokumenty/Robota/LFG/parses/ranked/%s' % (sents_dir))
 tex_dir = '/home/kasia/Dokumenty/Robota/LFG/tex/' + sents_dir.replace('/', '_') + '/'
@@ -109,7 +112,7 @@ if output_tex:
     os.system('mkdir ' + tex_dir)
     os.system('cp /home/kasia/Dokumenty/Robota/LFG/parses/avm.sty ' + tex_dir)
 processed = 0
-for sent_name in sentences[1120:]:
+for sent_name in sentences:
     sent_count += 1
     if sent_name in skip_sets[sents_dir]:
         #print 'SKIP:', sent_name
@@ -121,7 +124,7 @@ for sent_name in sentences[1120:]:
     except:
         print 'CAN\'T OPEN:', path
         continue
-    prolog_data = read_prolog_file(path, max_solutions=10000)
+    prolog_data = read_prolog_file(path, max_solutions=20000)
     if prolog_data is None:
         continue
     num_solutions, text = prolog_data.num_solutions, prolog_data.text
@@ -130,7 +133,7 @@ for sent_name in sentences[1120:]:
     if (num_solutions < 1):
         continue
     processed += 1
-    if (num_solutions > 10000):
+    if (num_solutions > 20000):
         continue
     num_consistent = 0.0
     count = 0
@@ -183,7 +186,7 @@ for sent_name in sentences[1120:]:
     for o in prolog_data.opts:
         #print o
         count += 1
-        if (num_solutions > 20 and count % (num_solutions / 10) == 0):
+        if (num_solutions > 200 and count % (num_solutions / 20) == 0):
             print count, '/', num_solutions
         #print 'tree', count, '====================================='
         try:
@@ -215,7 +218,8 @@ for sent_name in sentences[1120:]:
             if (known_problem and n_m == 1):
                 n_m = 0
         except KeyError:
-            raise
+            key_errors.add('***' + sent_name)
+            continue
             #n_m = 0
         if not n_m in no_match:
             no_match[n_m] = []
@@ -266,11 +270,15 @@ for sent_name in sentences[1120:]:
         #print no_match[min_n_m]
         #for opts in no_match[num_no_match]:
         #    print opts
-        fixed_choices, renamings, equivalences, merged = new_choices(no_match[num_no_match])
+        fixed_choices, renamings, equivalences, merged, choice_parents = new_choices(no_match[num_no_match])
         #    match_opts.update(opts)
         ranked_f = '/home/kasia/Dokumenty/Robota/LFG/parses/ranked/%s/%s-%d.pl' % (sents_dir, sent_name, num_no_match)
         with open(ranked_f, 'w') as mfile:
-            mfile.write(''.join(prolog_data.all_lines[:15]))
+            mfile.write(''.join(prolog_data.all_lines[:11]))
+            '''write the new number of solutions'''
+            stats_line_split = prolog_data.all_lines[11].split()
+            mfile.write(' '.join(['\t\'statistics\'(\'%d' % len(no_match[num_no_match])] + stats_line_split[1:]) + '\n')
+            mfile.write(''.join(prolog_data.all_lines[12:15]))
             mfile.write('\t% Choices:\n\t[\n')
             ls = []
             opts_map = {}
@@ -312,7 +320,7 @@ for sent_name in sentences[1120:]:
             ls = []
             for constr, l_no in prolog_data.constraint_list:
                 old_cond = constr.cond
-                constr.cond = fixed_conditions(constr.cond, active_opts, renamings, equivalences, merged)#sorted(set([opts_map[c] for c in constr.cond if c in match_opts]))
+                constr.cond = fixed_conditions(constr.cond, active_opts, renamings, equivalences, merged, fixed_choices, choice_parents)#sorted(set([opts_map[c] for c in constr.cond if c in match_opts]))
                 if (constr.cond):
                     ls.append(constr.prolog())
                 constr.cond = old_cond
@@ -321,13 +329,13 @@ for sent_name in sentences[1120:]:
             ls = []
             for phi, l_no in prolog_data.phis:
                 old_choices = phi.choices
-                phi.choices = fixed_conditions(phi.choices, active_opts, renamings, equivalences, merged)#sorted(set([opts_map[c] for c in phi.choices if c in active_opts]))
+                phi.choices = fixed_conditions(phi.choices, active_opts, renamings, equivalences, merged, fixed_choices, choice_parents)#sorted(set([opts_map[c] for c in phi.choices if c in active_opts]))
                 if (phi.choices):
                     ls.append((l_no, phi.prolog()))
                 phi.choices = old_choices
             for other, l_no in prolog_data.other_list:
                 old_choices = other.choices
-                other.choices = fixed_conditions(other.choices, active_opts, renamings, equivalences, merged)#sorted(set([opts_map[c] for c in other.choices if c in active_opts]))
+                other.choices = fixed_conditions(other.choices, active_opts, renamings, equivalences, merged, fixed_choices, choice_parents)#sorted(set([opts_map[c] for c in other.choices if c in active_opts]))
                 if (other.choices):
                     ls.append((l_no, other.prolog()))
                     #print type(other), other.prolog()
@@ -339,6 +347,7 @@ for sent_name in sentences[1120:]:
         for o in r_prolog_data.opts:
             r_fs, r_eqs_dict = build_fs([c for c, l_no in r_prolog_data.constraint_list if c.cond.intersection(o)])
         check_solutions_sum += len(r_prolog_data.opts)
+        print len(r_prolog_data.opts)
     if check_solutions_sum != num_solutions and not sent_name in key_errors:
         print key_errors
         raise RuntimeError
@@ -369,7 +378,7 @@ with open('/home/kasia/Dokumenty/Robota/LFG/stochastic/sents-list', 'w') as f:
     for x in sorted(ms):
         f.write(x + '\n')
 ms = []
-print stats
+#print stats
 if output_min_no_match:
     with open('/home/kasia/Dokumenty/Robota/LFG/parses/min-no-match-' + sents_dir.replace('/', '_') + '.csv', 'w') as matchfile:
         ms = []

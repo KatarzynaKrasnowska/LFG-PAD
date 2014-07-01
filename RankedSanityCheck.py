@@ -107,6 +107,7 @@ for s_name, solutions in sorted(solutions_full.items()):
         full_parses.append(parse)
     matched = set()
     for ranked_forest in ranked_forests[s_name]:
+        #print ranked_forest
         ranked_prolog_data = read_prolog_file(ranked_dir + ranked_forest, quiet=True)
         for o in ranked_prolog_data.opts:
             parse = [c for c, l_no in ranked_prolog_data.constraint_list if c.cond.intersection(o)]
