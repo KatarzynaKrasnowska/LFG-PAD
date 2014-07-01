@@ -17,6 +17,7 @@ class Special:
     advp = 'advp'
     sentp = 'sentp'
     infp = 'infp'
+    np_dop = 'np(dop)'
 
 czy_list = (u'CZY', u'CZYŻ', u'CZYŻBY', u'AZALI', u'AZALIŻ', u'LI')
 czy_list = [czy.lower() for czy in czy_list]
@@ -64,10 +65,12 @@ opt_subj = set([
 obj_th_pro = set([
     u'bronić', u'chcieć_się', u'dawać', u'dawać_się', u'dać', u'dać_się', u'doradzić', u'dozwolić',
     u'kazać', u'kłaść', u'nauczyć', u'obiecać', u'obiecywać', u'pomagać',
-    #u'pomóc',
+    u'pomóc',
     u'poradzić',
     u'postawić', u'pozwalać', u'pozwolić', u'położyć', u'proponować', u'przeszkadzać', u'radzić',
-    u'szkoda', u'trzeba', u'udawać_się', u'udać_się', u'uczyć', u'układać', u'ułożyć',
+    u'szkoda',
+    u'trudno',
+    u'trzeba', u'udawać_się', u'udać_się', u'uczyć', u'układać', u'ułożyć',
     u'wolno', u'wstyd', u'zabraniać', u'zaproponować', u'życzyć'
 ])
 
@@ -114,7 +117,9 @@ tfw_to_attr_dict = {
 
 special_tfw_to_attr = {
                        Special.sentp : set(['COMP']),
-                       Special.infp : set(['XCOMP'])
+                       Special.infp : set(['XCOMP']),
+                       # BIER ???
+                       #Special.np_dop : set(['OBJ', 'OBL-GEN', 'OBL-STR', 'OBL-TEMP']),
                        }
 
 def tfw_to_attr(node):
@@ -123,7 +128,7 @@ def tfw_to_attr(node):
         return tfw_to_attr_dict[tfw].copy()
     '''prepnp lub advp przerobione na prepnp'''
     if (tfw.startswith('prepnp')):
-        return set(['OBL', 'OBL2', 'OBL3', 'OBL-AG']).union(get_prepnp_sem_obls(tfw))
+        return set(['OBL', 'OBL2', 'OBL3']).union(get_prepnp_sem_obls(tfw))
     '''advp przysłówkowe'''
     if (tfw.startswith('advp')):
         return get_advp_sem_obls(tfw).copy()

@@ -149,4 +149,8 @@ skip_sets = {'Skladnica_FULL_prolog_20130405' :
              'Skladnica140410_FULL_prolog_POLFIE2v0.5_W-20140529':
              set([
                   ]),
+             'Skladnica140410_FULL_prolog_POLFIE2v0.5_W-20140608':
+             set([
+                  'Skladnica--FULL_1305000001881_morph_1-p_morph_1.40-s', # nie zgadza się num_solutions
+                  ]),
              }

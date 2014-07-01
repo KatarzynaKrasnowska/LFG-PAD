@@ -28,7 +28,7 @@ coord_rules = set([
     # fwe rownorzednie
     SkladnicaRules.wer1,
     # fwe szeregowo
-    SkladnicaRules.wes3,
+    SkladnicaRules.wes1, SkladnicaRules.wes3,
     # fno rownorzednie
     SkladnicaRules.nor1, SkladnicaRules.nor2, SkladnicaRules.nor3,
     # fno szeregowo
@@ -140,6 +140,7 @@ class TreeHandler(handler.ContentHandler):
             #print tree.to_tex()
             return tree
         else:
+            #print node._id, node._cat, node._tag, node._base, node._fs, node._rule
             root = SkladnicaNode(node._id, node._cat, node._tag, node._base, node._fs, node._rule)
             for ch_id in node._children:
                 child = self.skladnicaTree(self._nodes[ch_id],
@@ -245,8 +246,9 @@ class TreeHandler(handler.ContentHandler):
                 ffs = [child for child in root.children if child.cat == SkladnicaCats.ff]
                 if ffs:
                     ff = ffs[0]
-                    _, pred = find_pred(ff)
-                    if (pred == u'być' and ff.fs[SkladnicaFs.rekcja].find('infp(nd)') != -1):
+                    '''Może być None przy koordynacji, ale wtedy to nie bedzie 'być' od przyszłego złożony'''
+                    id_and_pred = find_pred(ff)
+                    if (id_and_pred is not None and id_and_pred[1] == u'być' and ff.fs[SkladnicaFs.rekcja].find('infp(nd)') != -1):
                         infp_fw = [child for child in root.children
                                    if SkladnicaFs.tfw in child.fs and child.fs[SkladnicaFs.tfw] == 'infp(nd)']
                         if infp_fw:
@@ -257,12 +259,6 @@ class TreeHandler(handler.ContentHandler):
                                 root.children += infp_child.children[0].children
                                 root.headChildren = infp_child.children[0].headChildren
                                 infp_child.children[0].headChildren[0].cat = SkladnicaCats.ff
-                                #for child in root.children:
-                                #    if (SkladnicaFs.tfw in child.fs and child.fs[SkladnicaFs.tfw] == 'infp(nd)'):
-                                #        root.children.remove(child)
-                                #        root.children += child.children[0].children
-                                #        root.headChildren = child.children[0].headChildren
-                                #        child.children[0].headChildren[0].cat = SkladnicaCats.ff
             '''korelat'''
             #TODO: kor2 i kor3 (nie wystepuja w Skladnicy - na razie...)
             if (root.rule == 'zdk1'):

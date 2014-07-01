@@ -13,9 +13,13 @@ from FStructure import build_fs
 sys.setrecursionlimit(1000)
 
 sents_dir = '/home/kasia/Dokumenty/Robota/LFG/parses/FULL_20130917_newdict_Skladnica-131011_updated_map/'
+sents_dir = '/home/kasia/Dokumenty/Robota/LFG/parses/Skladnica140410_FULL_prolog_POLFIE2v0.5_W-20140608/'
+
 sents_file = '/home/kasia/Dokumenty/Robota/LFG/Iness/all-13012014.txt'
+sents_file = '/home/kasia/Dokumenty/Robota/LFG/Iness/all-09062014.txt'
 #sents_file = '/home/kasia/Dokumenty/Robota/LFG/Iness/test.txt'
 ranked_dir = '/home/kasia/Dokumenty/Robota/LFG/parses/ranked/FULL_20130917_newdict_Skladnica-131011_updated_map/'
+ranked_dir = '/home/kasia/Dokumenty/Robota/LFG/parses/ranked/Skladnica140410_FULL_prolog_POLFIE2v0.5_W-20140608/'
 
 MAX_SOLUTIONS = 100000
 

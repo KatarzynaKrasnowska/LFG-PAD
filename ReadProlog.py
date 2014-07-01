@@ -132,8 +132,8 @@ def read_prolog_file(path, quiet=False, max_solutions=10000):
             if not n_id in children_buckets:
                 children_buckets[n_id] = {}
                 children_conds[n_id] = {}
-            if n_id == 497:
-                print n_id, children_buckets[n_id]
+            #if n_id == 497:
+            #    print n_id, children_buckets[n_id]
             for i in xrange(0, len(n.children_ids)):
                 ch_id, cond = n.children_ids[i]
                 if not i in children_buckets[n_id]:

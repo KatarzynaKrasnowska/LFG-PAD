@@ -62,6 +62,7 @@ class SkladnicaRules:
     zdsz3 = 'zdsz3'
     
     wer1 = 'wer1'
+    wes1 = 'wes1'
     wes3 = 'wes3'
     
     p1 = 'p1'         # zdanie -> zdanie przec spójnik zdanie
